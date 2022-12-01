@@ -1,0 +1,22 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
+
+# Yarn
+yarn-error.log
+
+# Coverage
+coverage
+
+# Dotenv
+!.env.example
+.env*
+.esbuild
+.env
+.DS_Store
