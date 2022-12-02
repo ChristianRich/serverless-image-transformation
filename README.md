@@ -7,6 +7,26 @@ Features:
 - HTTP interface
 - Event driven interface
 
+## Available flows
+
+### S3 pre-signed URL flow
+
+1. User requests pre-signed S3 upload URL
+2. User uploads image and receives the absolute S3 URL in the response
+3. User
+
+###
+
+# Step from UI
+
+### 1 Authenticated user requests pre-signed S3 upload URL
+
+Show curl
+
+### 2 User posts image transformation instructions includi
+
+Show curl
+
 Using JSON you can instruct the image processor to perform any number of transformations in a series.
 Using the HTTP
 

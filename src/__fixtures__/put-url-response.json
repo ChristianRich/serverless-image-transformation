@@ -1,0 +1,4 @@
+{
+  "s3Url": "https://sls-image-transformation2-dev-images.s3.ap-southeast-2.amazonaws.com/someFolder/4c059000050b4e1996dc657c0c0ced7e.jpg",
+  "uploadUrl": "https://sls-image-transformation2-dev-images.s3.ap-southeast-2.amazonaws.com/someFolder/4c059000050b4e1996dc657c0c0ced7e.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA4F2E3GVVY7BUS2HJ%2F20221202%2Fap-southeast-2%2Fs3%2Faws4_request&X-Amz-Date=20221202T110934Z&X-Amz-Expires=3600&X-Amz-Signature=947f6106c14fb2aa49f783fb55c522562ab4b3ab5b68c37035582154f4ec0d36&X-Amz-SignedHeaders=host&x-amz-acl=public-read&x-id=PutObject"
+}

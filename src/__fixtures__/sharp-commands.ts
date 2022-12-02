@@ -1,99 +1,96 @@
-// export interface Operation {
-//   command: string;
-//   options?: any;
-// }
+import { Command } from '@/types/input';
 
-const outputOptions = [
+export const outputOptions: Command[] = [
   {
-    command: 'withMetadata',
+    name: 'withMetadata',
   },
   {
-    command: 'toFormat',
+    name: 'toFormat',
     options: 'png',
   },
   {
-    command: 'jpeg',
+    name: 'jpeg',
     options: {
       quality: 100,
       chromaSubsampling: '4:4:4',
     },
   },
   {
-    command: 'png',
+    name: 'png',
     options: { palette: true },
   },
   {
-    command: 'webp',
+    name: 'webp',
     options: { lossless: true },
   },
   {
-    command: 'gif',
+    name: 'gif',
     options: { dither: 0 },
   },
 ];
 
-const getChannelManipulation = [
+export const getChannelManipulation: Command[] = [
   {
-    command: 'removeAlpha',
+    name: 'removeAlpha',
   },
   {
-    command: 'ensureAlpha',
+    name: 'ensureAlpha',
   },
   {
-    command: 'extractChannel',
+    name: 'extractChannel',
     options: 'green',
   },
   {
-    command: 'toColorspace',
+    name: 'toColorspace',
     options: 'rgb16',
   },
 ];
 
-const getColourManipulation = [
+export const getColourManipulation: Command[] = [
   {
-    command: 'tint',
+    name: 'tint',
     options: { r: 255, g: 240, b: 16 },
   },
   {
-    command: 'greyscale',
+    name: 'greyscale',
   },
   {
-    command: 'pipelineColourspace',
+    name: 'pipelineColourspace',
     options: 'rgb16',
   },
   {
-    command: 'toColorspace',
+    name: 'toColorspace',
     options: 'rgb16',
   },
 ];
 
-export const getImageOperations = [
+export const getImageOperations: Command[] = [
   {
-    command: 'resize',
+    name: 'resize',
     options: {
       width: 100,
       fit: 'contain',
     },
   },
   {
-    command: 'rotate',
+    name: 'rotate',
     options: 90,
   },
   {
-    command: 'flip',
+    name: 'flip',
   },
   {
-    command: 'flop',
+    name: 'flop',
   },
   {
-    command: 'affine',
+    name: 'affine',
     options: [
       [1, 0.3],
       [0.1, 0.7],
     ],
   },
   {
-    command: 'sharpen',
+    name: 'sharpen',
     options: {
       sigma: 2,
       m1: 0,
@@ -104,51 +101,51 @@ export const getImageOperations = [
     },
   },
   {
-    command: 'median',
+    name: 'median',
     options: {
       size: 5,
     },
   },
   {
-    command: 'blur',
+    name: 'blur',
     options: {
       sigma: 5,
     },
   },
   {
-    command: 'flatten',
+    name: 'flatten',
     options: {
       background: '#F0A703',
     },
   },
   {
-    command: 'gamma',
+    name: 'gamma',
     options: {
       gamma: 2.2,
       gammaOut: 2.2,
     },
   },
   {
-    command: 'negate',
+    name: 'negate',
     options: {
       alpha: false,
     },
   },
   {
-    command: 'normalize',
+    name: 'normalize',
     options: {
       normalise: true,
     },
   },
   {
-    command: 'clahe',
+    name: 'clahe',
     options: {
       width: 3,
       height: 3,
     },
   },
   {
-    command: 'convolve',
+    name: 'convolve',
     options: {
       width: 3,
       height: 2,
@@ -156,7 +153,7 @@ export const getImageOperations = [
     },
   },
   {
-    command: 'threshold',
+    name: 'threshold',
     options: {
       width: 3,
       height: 2,
@@ -164,14 +161,14 @@ export const getImageOperations = [
     },
   },
   {
-    command: 'linear',
+    name: 'linear',
     options: {
       a: 0.5,
       b: 2,
     },
   },
   {
-    command: 'recombe',
+    name: 'recombe',
     options: [
       [0.3588, 0.7044, 0.1368],
       [0.299, 0.587, 0.114],
@@ -179,7 +176,7 @@ export const getImageOperations = [
     ],
   },
   {
-    command: 'modulate',
+    name: 'modulate',
     options: {
       brightness: 0.5,
       saturation: 0.5,

@@ -17,6 +17,7 @@ provider:
   tracing:
     apiGateway: true
   environment:
+    SERVICE_NAME: ${self:service}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
     NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000"
     NODE_ENV: ${sls:stage}
@@ -29,7 +30,6 @@ provider:
             - s3:*
           Resource:
             - Fn::GetAtt: [ImageBucket, Arn]
-            # - "*"
 layers:
   sharp:
     name: ${sls:stage}-sharp-layer
@@ -40,7 +40,7 @@ layers:
       - nodejs16.x
     allowedAccounts:
       - "*"
-    retain: false # optional, false by default. If true, layer versions are not deleted as new ones are created
+    retain: false
 custom:
   imageBucketName: ${self:service}-${sls:stage}-images
   imageProcessingJobTableName: ${self:service}-${sls:stage}-jobs
@@ -59,8 +59,6 @@ custom:
     exclude:
       - aws-sdk
       - sharp
-    # external:
-    #   - sharp
     packagerOptions:
       scripts:
         - npm install --arch=x64 --platform=linux sharp
@@ -68,57 +66,26 @@ custom:
     platform: node
     concurrency: 10
 functions:
-  getPreSignedPUTUrl:
-    handler: src/handlers/pre-signed-put-url.handler
+  getPreSignedUrl:
+    handler: src/handlers/pre-signed-url.handler
     events:
       - http:
-          path: /upload/url/put
-          method: get
+          path: /url/{type}
+          method: post
           cors: true
           private: false
-  getPreSignedPOSTUrl:
-    handler: src/handlers/pre-signed-post-url.handler
-    events:
-      - http:
-          path: /upload/url/post
-          method: get
-          cors: true
-          private: false
-  imageProcessorWorker:
-    handler: src/workers/image-processor.handler
-    layers:
-      - !Ref SharpLambdaLayer
-    events:
-      - s3:
-          bucket: ${self:custom.imageBucketName}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: temp/
-  imageProcessorHttp:
-    handler: src/handlers/image-processor.handler
+  transform:
+    handler: src/handlers/transform.handler
     layers:
       - !Ref SharpLambdaLayer
     events:
       - http:
-          path: /process
+          path: /
           method: post
           cors: true
           private: false
 resources:
   Resources:
-    ImageTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.imageProcessingJobTableName}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        StreamSpecification:
-          StreamViewType: NEW_IMAGE
-        BillingMode: PAY_PER_REQUEST
     ImageBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -134,6 +101,7 @@ resources:
             - Effect: Allow
               Action:
                 - s3:GetObject
+                - s3:PutObject
               Resource:
                 - !Sub ${ImageBucket.Arn}/*
               Principal: "*"

@@ -1,56 +1,63 @@
 import sharp, { FormatEnum } from 'sharp';
 import type { Sharp } from 'sharp';
-import { Operation, ImageTransformation } from '@/types/sharp';
 import createHttpError from 'http-errors';
+import { Command, Input } from '@/types/input';
 import logger from '../logger';
 
 /**
- * Dynamically apply Sharp image transformations and return the result as buffer
+ * Dynamically apply Sharp image transformations and return the result as a buffer
  * @param {string} outputFormat e.g jpg, png, gif
- * @param {Buffer} imageData Image data
- * @param {ImageTransformation} transformations instructions passed on to Sharp
+ * @param {Buffer} imageData
+ * @param {ImageTransformation} transformations passed on to Sharp
  * @returns {Buffer}
  */
 export const applyTransformations = async (
   outputFormat: string,
   imageData: Buffer,
-  transformations: ImageTransformation,
+  input: Input,
 ): Promise<Buffer> => {
   try {
-    const image: Sharp = await sharp(imageData);
+    const image: Sharp = await sharp(imageData, {
+      sequentialRead: true,
+      failOn: 'error',
+    });
 
-    // Option to retain image metadata incl exif
-    if (transformations.withMetadata) {
+    // Option to retain image metadata incl exif and icc
+    if (input.options.retainMetadata) {
       image.withMetadata();
     }
 
-    // Create transformation tasks
-    const promises: Promise<Sharp>[] = transformations.operations
-      .filter((operation) => operation.skip !== true)
-      .map(({ command, options }: Operation) => {
-        if (typeof image[command] !== 'function') {
-          throw createHttpError(400, `Invalid Sharp command "${command}"`);
-        }
+    const { commands } = input;
 
-        return options ? image[command](options) : image[command]();
-      });
+    // Create and apply transformation commands
+    await Promise.all(
+      commands
+        .filter((op) => op.skip !== true)
+        .map(({ name: command, options }: Command) => {
+          if (typeof image[command] !== 'function') {
+            throw createHttpError(400, `Invalid Sharp command "${command}"`);
+          }
+          return options ? image[command](options) : image[command]();
+        }),
+    );
 
-    // Apply transformation tasks
-    await Promise.all(promises);
-
-    // Convert result to selected output format
-    const result: Buffer = await image
-      .toFormat(<keyof FormatEnum>outputFormat)
-      .toBuffer();
-
-    return result;
+    logger.debug(
+      `Successfully applied ${
+        commands.length
+      } Sharp transformations: ${commands.map((cmd) => cmd.name).toString()}`,
+    );
+    // Create image output format and convert to Buffer
+    return image.toFormat(<keyof FormatEnum>outputFormat).toBuffer();
   } catch (error) {
-    logger.error('Error applying image transformations', {
-      data: {
-        outputFormat,
-        transformations,
+    const { name, message } = <Error>error;
+    logger.error(
+      `Error applying Sharp image transformations ${name} ${message}`,
+      {
+        data: {
+          input,
+        },
       },
-    });
+    );
     throw error;
   }
 };

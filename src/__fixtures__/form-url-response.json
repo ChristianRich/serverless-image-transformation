@@ -1,0 +1,14 @@
+{
+  "s3Url": "https://sls-image-transformation2-dev-images.s3.ap-southeast-2.amazonaws.com/someFolder/c685c69b02ef4cee8126b2a031806183.jpg",
+  "fields": {
+    "acl": "public-read",
+    "bucket": "sls-image-transformation2-dev-images",
+    "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
+    "X-Amz-Credential": "AKIA4F2E3GVVY7BUS2HJ/20221202/ap-southeast-2/s3/aws4_request",
+    "X-Amz-Date": "20221202T110753Z",
+    "key": "someFolder/c685c69b02ef4cee8126b2a031806183.jpg",
+    "Policy": "eyJleHBpcmF0aW9uIjoiMjAyMi0xMi0wMlQxMjowNzo1M1oiLCJjb25kaXRpb25zIjpbeyJhY2wiOiJwdWJsaWMtcmVhZCJ9LHsiYnVja2V0Ijoic2xzLWltYWdlLXRyYW5zZm9ybWF0aW9uMi1kZXYtaW1hZ2VzIn0sWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMCwyNjIxNDQwMF0sWyJlcSIsIiRrZXkiLCJzb21lRm9sZGVyL2M2ODVjNjliMDJlZjRjZWU4MTI2YjJhMDMxODA2MTgzLmpwZyJdLHsiYWNsIjoicHVibGljLXJlYWQifSx7ImJ1Y2tldCI6InNscy1pbWFnZS10cmFuc2Zvcm1hdGlvbjItZGV2LWltYWdlcyJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9LHsiWC1BbXotQ3JlZGVudGlhbCI6IkFLSUE0RjJFM0dWVlk3QlVTMkhKLzIwMjIxMjAyL2FwLXNvdXRoZWFzdC0yL3MzL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotRGF0ZSI6IjIwMjIxMjAyVDExMDc1M1oifSx7ImtleSI6InNvbWVGb2xkZXIvYzY4NWM2OWIwMmVmNGNlZTgxMjZiMmEwMzE4MDYxODMuanBnIn1dfQ==",
+    "X-Amz-Signature": "8ee0854997db4ffd4451cf685e0e2543e1b8fbd33dbe684bd1f58589a1ec1b5f"
+  },
+  "uploadUrl": "https://sls-image-transformation2-dev-images.s3.ap-southeast-2.amazonaws.com/"
+}

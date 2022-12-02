@@ -13,23 +13,23 @@ import {
   PresignedPostOptions,
 } from '@aws-sdk/s3-presigned-post';
 
-const s3Client: S3Client = new S3Client({ region: process.env.region });
+const s3Client: S3Client = new S3Client({ region: getConfig('AWS_REGION') });
 
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/modules/_aws_sdk_s3_request_presigner.html
-export const getPreSignedPUTUploadUrl = async (
-  filename: string,
-  folder = '/temp',
+/**
+ * Generates pre-signed S3 upload url
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/modules/_aws_sdk_s3_request_presigner.html
+ * @param {string} bucket
+ * @param {string} key
+ * @returns {PresignedPost} POST URL and a collection of form fields
+ */
+export const getPreSignedUrl = async (
+  bucket: string,
+  key: string,
 ): Promise<string> => {
-  const Key = `${folder}/${filename}`;
   const input: PutObjectCommandInput = {
-    Bucket: getConfig(Config.IMAGE_BUCKET_NAME),
-    Key,
-    Tagging: 'sem=somethingSemantic', // Adds header { x-amz-tagging: 'sem%3DsomethingSemantic' }
+    Bucket: bucket,
+    Key: key,
     ACL: 'public-read',
-    // User defined Meta data
-    Metadata: {
-      id: Key, // Adds header { x-amz-meta-id: '12345' }
-    },
   };
 
   const command: PutObjectCommand = new PutObjectCommand(input);
@@ -40,33 +40,35 @@ export const getPreSignedPUTUploadUrl = async (
   return signedUrl;
 };
 
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/modules/_aws_sdk_s3_presigned_post.html
-// https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html
-// https://www.edureka.co/community/21031/public-ish-write-access-to-s3-bucket-with-file-size-limiting
-export const getPreSignedPOSTUploadUrl = async (
-  filename: string,
-  folder = '/temp',
+/**
+ * Generates pre-signed S3 upload url suitable for use in a multipart/form-data HTML form
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/modules/_aws_sdk_s3_presigned_post.html
+ * https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html
+ * @param {string} filename
+ * @param {string} folder
+ * @param {fileSizeLimitMb} fileSizeLimitMb Upload file size restriction in mega bytes (mB)
+ * @returns {PresignedPost} POST URL including a collection of form fields
+ */
+export const getPresignedFormUrl = async (
+  bucket: string,
+  key: string,
+  fileSizeLimitMb = Config.FILE_SIZE_UPLOAD_LIMIT_MB,
 ): Promise<PresignedPost> => {
-  const Bucket = getConfig(Config.IMAGE_BUCKET_NAME);
-  const Key = `${folder}/${filename}`;
+  const Key = key;
   const Conditions: PresignedPostOptions['Conditions'] = [
     { acl: 'public-read' },
-    { bucket: Bucket },
-    ['content-length-range', 0, 10 * 1024 * 1024],
-    // ['starts-with', '$key', 'user/eric/'],
+    { bucket },
+    ['content-length-range', 0, fileSizeLimitMb * 1024 * 1024],
     ['eq', '$key', Key],
   ];
-  const Fields = {
+  const Fields: Record<string, string> = {
     acl: 'public-read',
   };
-
-  const { url, fields }: PresignedPost = await createPresignedPost(s3Client, {
-    Bucket,
+  return createPresignedPost(s3Client, {
+    Bucket: bucket,
     Key,
     Conditions,
     Fields,
-    Expires: 600, // Seconds before the presigned post expires. 3600 by default.
+    Expires: 3600,
   });
-
-  return { url, fields };
 };

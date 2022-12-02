@@ -31,10 +31,12 @@ export const jsonSchemaBodyValidator = <T>(
     }
 
     const result: ValidatorResult = validate(body, schema, options);
-    const { errors }: { errors: ValidationError[] } = result;
+    const { errors } = result;
 
-    if (errors.length) {
-      throw createError(400, errors[0].message);
+    if (errors?.length) {
+      const e: ValidationError = result.errors[0];
+      const message = `${e.path} ${e.message}} @property ${e.property}`;
+      throw createError(400, message);
     }
   };
 

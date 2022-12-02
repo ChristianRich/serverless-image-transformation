@@ -1,0 +1,41 @@
+{
+  "source": {
+    "http": {
+      "url": "https://images.unsplash.com/photo-1485178575877-1a13bf489dfe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2301&q=80",
+      "forwardHeaders": ["authorization"]
+    },
+    "s3": {
+      "bucket": "sls-image-transformation2-dev-images",
+      "key": "uploads/some-image.jpg"
+    }
+  },
+  "destination": {
+    "http": true,
+    "s3": {
+      "bucket": "sls-image-transformation2-dev-images",
+      "key": "processed/some-image.jpg"
+    }
+  },
+  "options": {
+    "outputFormat": "jpeg",
+    "retainMetadata": false
+  },
+  "commands": [
+    {
+      "name": "resize",
+      "skip": false,
+      "options": {
+        "width": 600
+      }
+    },
+    {
+      "name": "greyscale",
+      "skip": false
+    },
+    {
+      "name": "sharpen",
+      "skip": false,
+      "options": 1
+    }
+  ]
+}
