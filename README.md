@@ -1,74 +1,85 @@
 # Serverless image transformation
 
-Agnostic Serverless function for transforming images on the fly using [npm sharp](https://www.npmjs.com/package/sharp).
+AWS Serverless function for high-speed image transformation leveraged by [npm sharp](https://www.npmjs.com/package/sharp).
 
-Features:
+## Highlights
 
-- HTTP interface
-- Event driven interface
+- Non-opinionated, dead-simple on-the-fly image resizing
+- Blazing fast, rich interface with chain-able methods
+- S3 integration
+- No upload file size restrictions due to pre-signed upload URLs
+- Best-in-class for speed and features thanks to the underlying [libvips](https://www.libvips.org/) image processing library
 
-## Available flows
+## Example 1
 
-### S3 pre-signed URL flow
-
-1. User requests pre-signed S3 upload URL
-2. User uploads image and receives the absolute S3 URL in the response
-3. User
-
-###
-
-# Step from UI
-
-### 1 Authenticated user requests pre-signed S3 upload URL
-
-Show curl
-
-### 2 User posts image transformation instructions includi
-
-Show curl
-
-Using JSON you can instruct the image processor to perform any number of transformations in a series.
-Using the HTTP
-
+Resize and greyscale a 2000x3000 pixels 1Mb JPG image, upload to S3 and return the image to the client
 ![Postman testing](./docs/postman-testing.png)
 
-## Sample payload
+## API input/output table
 
-```json
-{
-  "source": {
-    "url": "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg",
-    "forwardHeaders": []
-  },
-  "outputFormat": "jpeg",
-  "withMetadata": true,
-  "operations": [
-    {
-      "command": "resize",
-      "skip": false,
-      "options": {
-        "width": 250
-      }
-    },
-    {
-      "command": "greyscale",
-      "skip": false
-    },
-    {
-      "command": "rotate",
-      "options": 45,
-      "skip": false
-    },
-    {
-      "command": "sharpen",
-      "skip": false,
-      "options": 2.5
-    },
-    {
-      "command": "median",
-      "skip": true,
-      "options": 2
-    }
-  ]
-}
+This API was built with flexibility in mind and offer below input/output combinations.
+| Image source | Image destination | Use case |
+| :----------- | :---------------- | :------------------------------------------------------------------------------------------------------------------ |
+| HTTP | HTTP | Load image from HTTP source > Apply transformations > Return result to client as `Content-Type image/*` |
+| HTTP | S3 | Load image from HTTP source > Apply transformations > Upload result to S3 > Return the absolute S3 public image URL |
+| S3 | HTTP | Load image from S3 bucket > Apply transformations > Return result to client as `Content-Type image/*` |
+| S3 | S3 | Load image from S3 > Apply transformations > Upload result to S3 > Returns the absolute S3 public image URL |
+
+## Key features
+
+This API has two jobs:
+
+- Apply image transformations and convert between common image formats
+- Issue pre-signed upload URLs for secure and direct streaming to am S3 bucket
+
+This solutions offers a good balance between the low cost and speed of AWS Lambda combined with rich image processing capabilities neatly packaged up in a one-click deployment package.
+
+## Example 2
+
+TODO
+
+## Example 3
+
+TODO
+
+## Prerequisites
+
+An AWS account with CLI and API access in a non-restricted account
+
+Install the Serverless framework globally:
+
 ```
+npm i -g serverless
+```
+
+## Install
+
+```
+yarn install
+```
+
+## Run locally
+
+```
+sls offline
+```
+
+## Deploy to AWS
+
+```
+sls deploy
+```
+
+## Why I built this
+
+I prefer working with agnostic, re-usable and decoupled components in the cloud. I also prefer keepingmy running costs down and avoid on-going monthly subscription fees to 3rd party paid services like [Cloudinary](https://cloudinary.com/).
+
+I would hardly compare my efforts with the fantastic features of Cloudinary, but often I've seen large companies pay MILLIONS OF DOLLARS a year on silly 3rd party IT subscriptions and only using A FRACTION of the features, that an in-house team of developers easily could have built putting a few Lambda functions together.
+
+I like low cost and simplicity, that's what I built this service.
+If you think about it, for the majority of use-cases the requirement for image transformations can be reduced to creating thumbnails and different sizes for different screens and storing it in the cloud. I'd say that covers 80% of use-cases.
+
+## TODO
+
+- Unit tests
+- Integration test
