@@ -20,9 +20,18 @@ export const getObject = async (
   };
 
   const command: GetObjectCommand = new GetObjectCommand(input);
-  const response: GetObjectCommandOutput = await s3Client.send(command);
-  logger.debug(`Loaded source image from ${JSON.stringify(input, null, 2)}`);
-  return streamToBuffer(response);
+
+  try {
+    logger.debug('s3.GetObjectCommand', { data: { input } });
+    const response: GetObjectCommandOutput = await s3Client.send(command);
+    return streamToBuffer(response);
+  } catch (error) {
+    const { name, message } = error;
+    logger.error(`s3.GetObjectCommand ${name} ${message}`, {
+      data: input,
+    });
+    throw error;
+  }
 };
 
 const streamToBuffer = async (

@@ -68,6 +68,8 @@ custom:
 functions:
   getPreSignedUrl:
     handler: src/handlers/pre-signed-url.handler
+    description: |
+      Returns a pre-signed S3 upload url. For the type use either '/s2s' or '/form'
     events:
       - http:
           path: /url/{type}
@@ -76,6 +78,9 @@ functions:
           private: false
   transform:
     handler: src/handlers/transform.handler
+    description: |
+      Accepts a set of image transform instructions (source, destination, options and commands)
+      and either returns the transformation result as `Content-Type: image/*` or uploads to S3
     layers:
       - !Ref SharpLambdaLayer
     events:
@@ -100,8 +105,9 @@ resources:
           Statement:
             - Effect: Allow
               Action:
-                - s3:GetObject
-                - s3:PutObject
+                # - s3:GetObject
+                # - s3:PutObject
+                - s3:*
               Resource:
                 - !Sub ${ImageBucket.Arn}/*
               Principal: "*"

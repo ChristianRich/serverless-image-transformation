@@ -1,0 +1,30 @@
+{
+  "source": {
+    "http": {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/%22Senior_Portrait_Headshot%22_3963.jpg",
+      "forwardHeaders": []
+    }
+  },
+  "destination": {
+    "http": true,
+    "s3": {
+      "bucket": "sls-image-transformation2-dev-images",
+      "key": "someFolder/{testtest.jpg"
+    }
+  },
+  "options": {
+    "outputFormat": "jpeg",
+    "retainMetadata": false
+  },
+  "commands": [
+    {
+      "name": "resize",
+      "options": {
+        "width": 600
+      }
+    },
+    {
+      "name": "greyscale"
+    }
+  ]
+}

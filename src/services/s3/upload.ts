@@ -17,6 +17,7 @@ export const putObject = async (
   image: Buffer,
 ): Promise<string> => {
   const ext = key.substring(key.lastIndexOf('.') + 1);
+
   const input: PutObjectCommandInput = {
     Bucket: bucket,
     Key: key,
@@ -25,10 +26,20 @@ export const putObject = async (
     ACL: 'public-read',
   };
 
-  const command: PutObjectCommand = new PutObjectCommand(input);
-  await s3Client.send(command);
-  logger.debug('Image uploaded to S3', {
+  logger.debug('s3.PutObjectCommand', {
     data: omit(input, 'Body'),
   });
-  return resolveS3AbsoluteUrl(key, serviceName);
+
+  const command: PutObjectCommand = new PutObjectCommand(input);
+
+  try {
+    await s3Client.send(command);
+    return resolveS3AbsoluteUrl(key, serviceName);
+  } catch (error) {
+    const { name, message } = error;
+    logger.error(`s3.PutObjectCommand ${name} ${message}`, {
+      data: omit(input, 'Body'),
+    });
+    throw error;
+  }
 };

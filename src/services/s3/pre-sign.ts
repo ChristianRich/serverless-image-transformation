@@ -12,6 +12,8 @@ import {
   PresignedPost,
   PresignedPostOptions,
 } from '@aws-sdk/s3-presigned-post';
+import { omit } from 'lodash';
+import logger from '../logger';
 
 const s3Client: S3Client = new S3Client({ region: getConfig('AWS_REGION') });
 
@@ -33,11 +35,20 @@ export const getPreSignedUrl = async (
   };
 
   const command: PutObjectCommand = new PutObjectCommand(input);
-  const signedUrl = await getSignedUrl(s3Client, command, {
-    expiresIn: 3600,
-  });
 
-  return signedUrl;
+  try {
+    logger.debug('s3.getSignedUrl', { data: { input } });
+    const signedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 3600,
+    });
+    return signedUrl;
+  } catch (error) {
+    const { name, message } = error;
+    logger.error(`s3.PutObjectCommand ${name} ${message}`, {
+      data: input,
+    });
+    throw error;
+  }
 };
 
 /**
@@ -64,11 +75,22 @@ export const getPresignedFormUrl = async (
   const Fields: Record<string, string> = {
     acl: 'public-read',
   };
-  return createPresignedPost(s3Client, {
+  const input: PresignedPostOptions = {
     Bucket: bucket,
     Key,
     Conditions,
     Fields,
     Expires: 3600,
-  });
+  };
+  try {
+    logger.debug('s3.createPresignedPost', { data: { input } });
+    const result: PresignedPost = await createPresignedPost(s3Client, input);
+    return result;
+  } catch (error) {
+    const { name, message } = error;
+    logger.error(`s3.createPresignedPost ${name} ${message}`, {
+      data: input,
+    });
+    throw error;
+  }
 };
