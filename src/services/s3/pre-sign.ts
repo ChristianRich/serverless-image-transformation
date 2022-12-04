@@ -12,7 +12,6 @@ import {
   PresignedPost,
   PresignedPostOptions,
 } from '@aws-sdk/s3-presigned-post';
-import { omit } from 'lodash';
 import logger from '../logger';
 
 const s3Client: S3Client = new S3Client({ region: getConfig('AWS_REGION') });

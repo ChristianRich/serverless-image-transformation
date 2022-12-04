@@ -5,6 +5,7 @@ import type {
 import { middyfyWithRequestBody } from '@/middleware';
 import { transform, OrchestratorOutput } from '@/services/image/transform';
 import logger from '@/services/logger';
+import mimeTypes from 'mime-types';
 import { Input, requestBodyValidationSchema } from '../types/input';
 
 const baseHandler: ValidatedEventAPIGatewayProxyEvent<
@@ -17,15 +18,13 @@ const baseHandler: ValidatedEventAPIGatewayProxyEvent<
   const { options, destination } = input;
 
   logger.debug('Image transformation request received', { data: input });
-
   const output: OrchestratorOutput = await transform(input, headers);
 
-  // Return the bitmap to the caller in the response body
   if (destination.http && output.destImage) {
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': `image/${options.outputFormat}`, // TODO Something's wrong here, "jpeg" works but "jpg" does not?
+        'Content-Type': mimeTypes.lookup(options.outputFormat),
       },
       body: output.destImage.toString('base64'),
       isBase64Encoded: true,

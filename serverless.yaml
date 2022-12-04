@@ -89,6 +89,16 @@ functions:
           method: post
           cors: true
           private: false
+  getImageMetaData:
+    handler: src/handlers/meta-data.handler
+    description: |
+      Accepts an image and returns the meta-data
+    events:
+      - http:
+          path: /meta-data
+          method: get
+          cors: true
+          private: false
 resources:
   Resources:
     ImageBucket:

@@ -17,12 +17,9 @@ export const applyTransformations = async (
   input: Input,
 ): Promise<Buffer> => {
   try {
-    const image: Sharp = await sharp(imageData, {
-      sequentialRead: true,
-      failOn: 'error',
-    });
+    const image: Sharp = await sharp(imageData);
 
-    // Option to retain image metadata incl exif and icc
+    // Option to retain image meta-data
     if (input.options.retainMetadata) {
       image.withMetadata();
     }
@@ -46,6 +43,7 @@ export const applyTransformations = async (
         commands.length
       } Sharp transformations: ${commands.map((cmd) => cmd.name).toString()}`,
     );
+
     // Create image output format and convert to Buffer
     return image.toFormat(<keyof FormatEnum>outputFormat).toBuffer();
   } catch (error) {

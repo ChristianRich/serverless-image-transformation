@@ -3,7 +3,7 @@ import { APIGatewayProxyEventHeaders } from 'aws-lambda';
 import { fetchImage } from '../axios/image';
 import { getObject } from '../s3/fetch';
 import { putObject } from '../s3/upload';
-import { applyTransformations } from '../sharp';
+import { applyTransformations } from '../sharp/transform';
 
 export interface OrchestratorOutput {
   s3Url?: string;
