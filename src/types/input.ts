@@ -3,6 +3,11 @@ export interface Input {
   destination?: Destination;
   options?: Options;
   commands?: Command[];
+  internal?: Internal;
+}
+
+export interface Internal {
+  source: Buffer;
 }
 
 export interface Command {
@@ -84,7 +89,6 @@ export const requestBodyValidationSchema = {
           type: 'boolean',
         },
       },
-      required: ['outputFormat'],
       additionalProperties: false,
     },
     commands: {
@@ -92,7 +96,7 @@ export const requestBodyValidationSchema = {
       items: { $ref: '#/$defs/command' },
     },
   },
-  required: ['source', 'destination', 'options', 'commands'],
+  required: ['source', 'commands'],
   additionalProperties: false,
   $defs: {
     http: {

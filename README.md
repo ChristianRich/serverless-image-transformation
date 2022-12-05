@@ -10,7 +10,7 @@ AWS Serverless function for high-speed image transformation powered by [npm shar
 - No upload file size restrictions
 - Best-in-class for speed and features thanks to the underlying [libvips](https://www.libvips.org/) image processing library
 
-## Example: Resize image to fill given dimensions
+## Resize image to fill given dimensions
 
 ![](https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?w=300&q=80)
 
@@ -24,12 +24,6 @@ curl --location --request POST 'https://xxxxxxxxxx.execute-api.ap-southeast-2.am
       "http":{
          "url":"https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?w=300&q=80"
       }
-   },
-   "destination":{
-      "http":true
-   },
-   "options": {
-     "outputFormat": "jpg"
    },
    "commands":[
       {
@@ -68,8 +62,6 @@ If your requirements are image resizing / manipulation and hosting, this free so
 ## Prerequisites
 
 - AWS account
-- AWS CLI
-- S
 
 Install the Serverless framework globally:
 

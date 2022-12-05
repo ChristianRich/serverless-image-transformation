@@ -7,23 +7,19 @@ import { applyTransformations } from '../sharp/transform';
 
 export interface OrchestratorOutput {
   s3Url?: string;
-  destImage: Buffer;
+  destImage: Buffer; // Result of processing
 }
 
 /**
- * Orchestrates the file handling logic based on user input
+ * Orchestrates the file handling logic based on user input options
  */
 export const transform = async (
   input: Input,
   headers: APIGatewayProxyEventHeaders,
 ): Promise<OrchestratorOutput> => {
   const sourceImage: Buffer = await getSource(input, headers);
-
-  const { options } = input;
-  const { outputFormat } = options;
-
   const destImage: Buffer = await applyTransformations(
-    outputFormat,
+    input.options.outputFormat,
     sourceImage,
     input,
   );

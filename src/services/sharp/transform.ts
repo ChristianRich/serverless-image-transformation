@@ -20,7 +20,7 @@ export const applyTransformations = async (
     const image: Sharp = await sharp(imageData);
 
     // Option to retain image meta-data
-    if (input.options.retainMetadata) {
+    if (input?.options?.retainMetadata) {
       image.withMetadata();
     }
 

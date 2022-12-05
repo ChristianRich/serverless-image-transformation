@@ -13,12 +13,6 @@ curl --location --request POST 'https://xxxxxxxxxx.execute-api.ap-southeast-2.am
          "url":"https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?w=300&q=80"
       }
    },
-   "destination":{
-      "http":true
-   },
-   "options": {
-     "outputFormat": "jpg"
-   },
    "commands":[
       {
          "name":"resize",
@@ -58,7 +52,7 @@ curl --location --request POST 'https://xxxxxxxxxx.execute-api.ap-southeast-2.am
     }
   },
   "options": {
-    "outputFormat": "png"
+    "outputFormat": "webp"
   },
   "commands": [
     {
