@@ -13,14 +13,10 @@ export interface OrchestratorOutput {
 /**
  * Orchestrates the file handling logic based on user input options
  */
-export const transform = async (
-  input: Input,
-  headers: APIGatewayProxyEventHeaders,
-): Promise<OrchestratorOutput> => {
-  const sourceImage: Buffer = await getSource(input, headers);
+export const transform = async (input: Input): Promise<OrchestratorOutput> => {
   const destImage: Buffer = await applyTransformations(
     input.options.outputFormat,
-    sourceImage,
+    input.internal.source,
     input,
   );
 

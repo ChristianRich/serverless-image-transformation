@@ -28,7 +28,7 @@ const baseHandler: ValidatedEventAPIGatewayProxyEvent<
   await setDefaultOptions(input, headers);
 
   const { options, destination } = input;
-  const output: OrchestratorOutput = await transform(input, headers);
+  const output: OrchestratorOutput = await transform(input);
 
   if (destination.http && output.destImage) {
     return {
