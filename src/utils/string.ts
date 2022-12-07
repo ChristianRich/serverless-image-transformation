@@ -1,12 +1,12 @@
+import { Config } from '@/constants';
 import { getConfig } from './env';
 
 export const resolveS3AbsoluteUrl = (
   key: string,
-  serviceName: string,
-): string =>
-  `https://${serviceName}-${getConfig('NODE_ENV')}-images.s3.${getConfig(
-    'AWS_REGION',
-  )}.amazonaws.com/${key}`;
+  bucket: string = getConfig(Config.IMAGE_BUCKET_NAME),
+  region: string = getConfig(Config.AWS_REGION),
+): string => `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 
-export const getFileExtension = (file: string): string =>
-  /(?:\.([^.]+))?$/.exec(file)[1];
+// https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
+export const getFileExtension = (fn: string): string =>
+  fn.split('.').pop().toLowerCase();

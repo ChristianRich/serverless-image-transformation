@@ -1,43 +1,41 @@
+import type { HttpError } from 'http-errors';
 import { middyfyWithRequestBody } from '@/middleware';
-import {
-  ValidatedAPIGatewayProxyEvent,
-  ValidatedEventAPIGatewayProxyEvent,
-} from '@/types/api-gateway';
 import { resolvePresignedUrl } from '@/services/upload';
+import { requestBodyValidationSchema } from '@/types/input';
+import logger from '@/services/logger';
+import { PresignedUploadUrl, PresignedUrlType } from '@/types';
+import {
+  APIGatewayProxyHandler,
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+} from 'aws-lambda';
 
-export const requestBodyValidationSchema = {
-  type: 'object',
-  properties: {
-    s3: {
-      type: 'object',
-      properties: {
-        bucket: { type: 'string' },
-        key: { type: 'string' },
-      },
-    },
-  },
-  additionalProperties: false,
-} as const;
-
-const baseHandler: ValidatedEventAPIGatewayProxyEvent<
-  typeof requestBodyValidationSchema
-> = async (
-  event: ValidatedAPIGatewayProxyEvent<typeof requestBodyValidationSchema>,
-) => {
+const baseHandler: APIGatewayProxyHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   const { body, pathParameters } = event;
-  const { s3 = {} } = body || {};
-  const { type } = pathParameters;
+  const { type, filename } = pathParameters;
 
   try {
-    const res = await resolvePresignedUrl(type, s3);
+    const result: PresignedUploadUrl = await resolvePresignedUrl(
+      <PresignedUrlType>type,
+      filename,
+    );
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ ...res }),
+      body: JSON.stringify(result),
     };
   } catch (error) {
+    const { name, message, statusCode = 500 } = <Error | HttpError>error;
+
+    logger.error(`User getting pre-signed URL ${name} ${message}`, {
+      data: { body },
+    });
+
     return {
-      statusCode: 500,
-      body: JSON.stringify(error),
+      statusCode,
+      body: JSON.stringify({ name, message, statusCode }),
     };
   }
 };

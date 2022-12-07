@@ -22,6 +22,7 @@ provider:
     NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000"
     NODE_ENV: ${sls:stage}
     IMAGE_BUCKET_NAME: ${self:custom.imageBucketName}
+    FILE_SIZE_POST_UPLOAD_LIMIT_MB: "25"
   iam:
     role:
       statements:
@@ -69,23 +70,35 @@ functions:
   getPreSignedUrl:
     handler: src/handlers/pre-signed-url.handler
     description: |
-      Returns a pre-signed S3 upload url. For the type use either '/s2s' or '/form'
+      Returns a pre-signed S3 upload url. For the type parameter, use either '/s2s' or '/form'
     events:
       - http:
-          path: /url/{type}
-          method: post
+          path: /presign/{type}/{filename}
+          method: get
           cors: true
-          private: false
-  transform:
-    handler: src/handlers/transform.handler
+          private: false # TODO add api-key protection
+  transformAsync:
+    handler: src/handlers/transform-async.handler
     description: |
-      Accepts a set of image transform instructions (source, destination, options and commands)
-      and either returns the transformation result as `Content-Type: image/*` or uploads to S3
+      Accepts image transformation options (source, destination, options and commands)
+      and either returns the transformation result as `Content-Type: image/*` or uploads to S3 (asyncronious invocation)
     layers:
       - !Ref SharpLambdaLayer
     events:
       - http:
-          path: /
+          path: /async
+          method: post
+          cors: true
+          private: false
+  transformSync:
+    handler: src/handlers/transform-sync.handler
+    description: |
+      Accepts image transformation optionn, immediately return the S3 image URL, and then process the upload in the background (syncronious invocation)
+    layers:
+      - !Ref SharpLambdaLayer
+    events:
+      - http:
+          path: /sync
           method: post
           cors: true
           private: false
@@ -115,9 +128,8 @@ resources:
           Statement:
             - Effect: Allow
               Action:
-                # - s3:GetObject
-                # - s3:PutObject
-                - s3:*
+                - s3:GetObject
+                - s3:PutObject
               Resource:
                 - !Sub ${ImageBucket.Arn}/*
               Principal: "*"

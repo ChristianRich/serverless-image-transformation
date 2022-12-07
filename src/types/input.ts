@@ -1,3 +1,4 @@
+// Represents the image transformation input options as provided by the user
 export interface Input {
   source?: Source;
   destination?: Destination;
@@ -6,21 +7,32 @@ export interface Input {
   internal?: Internal;
 }
 
+// User internally to pass the source image around
 export interface Internal {
   source: Buffer;
 }
 
+// A Sharp image transformation command
 export interface Command {
+  // Operation name e.g 'reszie'. See Sharp docs for details
   name: string;
-  options?: unknown;
+
+  // Options passed to image operation. See the Sharp docs for details
+  options?: Options;
+
+  // When true, filter is skipped. Handy when composing complex transformations and you want to toggle filters on/off and compare results. Defaults to false
   skip?: boolean;
 }
 
 export interface Options {
-  outputFormat: string;
+  // Output format e.g jpg, png, gif. When not supplied will fallback on the format of the source image. See Sharp docs for details
+  outputFormat?: string;
+
+  // When true keeps the image meta data incl exif for the transformation output. Defaults to false
   retainMetadata?: boolean;
 }
 
+// Image source either URL or S3
 export interface Source {
   http?: {
     url: string;
@@ -35,8 +47,8 @@ export interface Destination {
 }
 
 export interface S3Bucket {
-  bucket?: string;
-  key?: string;
+  bucket: string;
+  key: string;
 }
 
 export const requestBodyValidationSchema = {

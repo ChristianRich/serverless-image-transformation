@@ -6,23 +6,23 @@ import {
   PutObjectCommandInput,
 } from '@aws-sdk/client-s3';
 import { omit } from 'lodash';
+import mimeTypes from 'mime-types';
 import { name as serviceName } from '../../../package.json';
 import logger from '../logger';
 
 const s3Client: S3Client = new S3Client({ region: getConfig('AWS_REGION') });
 
+// Upload an image to S3 and returns the absolute image url
 export const putObject = async (
   bucket: string,
   key: string,
   image: Buffer,
 ): Promise<string> => {
-  const ext = key.substring(key.lastIndexOf('.') + 1);
-
   const input: PutObjectCommandInput = {
     Bucket: bucket,
     Key: key,
     Body: image,
-    ContentType: `image/${ext.toLowerCase()}`,
+    ContentType: <string>mimeTypes.contentType(key),
     ACL: 'public-read',
   };
 

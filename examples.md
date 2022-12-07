@@ -1,4 +1,4 @@
-# Resize image to given dimensions
+# Example #1: Resize image to given dimensions
 
 ![](https://images.unsplash.com/photo-1444021465936-c6ca81d39b84?w=300&q=80)
 
@@ -29,7 +29,7 @@ Result
 
 ![](./docs/photo-1444021465936-c6ca81d39b84.png)
 
-# Tint, resize, flip horizontally, sharpen, convert to `webp` and upload to S3
+# Example #2: Tint, resize, flop, sharpen, convert to `webp` and upload to S3
 
 ![](https://images.unsplash.com/photo-1568429838920-de3a3aa8cf1c?w=600&q=80)
 
@@ -77,6 +77,6 @@ curl --location --request POST 'https://xxxxxxxxxx.execute-api.ap-southeast-2.am
 '
 ```
 
-Result
+Image uploaded to S3 and returned to API client as `image/webp`
 
 ![](./docs/photo-1568429838920-de3a3aa8cf1c.webp)

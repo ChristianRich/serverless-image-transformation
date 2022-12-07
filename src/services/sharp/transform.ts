@@ -6,46 +6,43 @@ import logger from '../logger';
 
 /**
  * Dynamically apply Sharp image transformations and return the result as a buffer
- * @param {string} outputFormat e.g jpg, png, gif
- * @param {Buffer} imageData
- * @param {ImageTransformation} transformations passed on to Sharp
+ * @param {Input} Input
  * @returns {Buffer}
  */
-export const applyTransformations = async (
-  outputFormat: string,
-  imageData: Buffer,
-  input: Input,
-): Promise<Buffer> => {
+export const applyTransformations = async (input: Input): Promise<Buffer> => {
   try {
-    const image: Sharp = await sharp(imageData);
+    const image: Sharp = await sharp(input.internal.source);
 
-    // Option to retain image meta-data
+    // Option to retain meta-data
     if (input?.options?.retainMetadata) {
       image.withMetadata();
     }
 
     const { commands } = input;
 
-    // Create and apply transformation commands
+    logger.debug(
+      `Applying ${commands.length} Sharp image transformations: ${commands
+        .map((cmd: Command) => cmd.name)
+        .toString()
+        .replace(/,/g, ', ')}`,
+    );
+
+    // Apply Sharp image transformations
     await Promise.all(
       commands
-        .filter((op) => op.skip !== true)
-        .map(({ name: command, options }: Command) => {
-          if (typeof image[command] !== 'function') {
-            throw createHttpError(400, `Invalid Sharp command "${command}"`);
+        .filter((cmd: Command) => cmd.skip !== true)
+        .map(({ name, options }: Command) => {
+          if (typeof image[name] !== 'function') {
+            throw createHttpError(400, `Invalid Sharp method "${name}"`);
           }
-          return options ? image[command](options) : image[command]();
+          return options ? image[name](options) : image[name]();
         }),
     );
 
-    logger.debug(
-      `Successfully applied ${
-        commands.length
-      } Sharp transformations: ${commands.map((cmd) => cmd.name).toString()}`,
-    );
-
     // Create image output format and convert to Buffer
-    return image.toFormat(<keyof FormatEnum>outputFormat).toBuffer();
+    return image
+      .toFormat(<keyof FormatEnum>input.options.outputFormat)
+      .toBuffer();
   } catch (error) {
     const { name, message } = <Error>error;
     logger.error(
