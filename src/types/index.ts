@@ -1,7 +1,7 @@
 export interface PresignedUploadUrl {
   uploadUrl: string;
   fields?: Record<string, string>;
-  s3Url?: string;
+  s3Url: string;
 }
 
 export interface PresignedPost {
