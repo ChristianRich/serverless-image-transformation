@@ -1,7 +1,7 @@
 {
-  "name": "sls-image-transformation2",
+  "name": "sls-image-transform",
   "version": "1.0.0",
-  "description": "Serverless image processor using npm sharp",
+  "description": "Serverless image processor using Sharp",
   "scripts": {
     "start": "serverless offline",
     "deploy:dev": "serverless deploy --aws-profile personal --stage dev",

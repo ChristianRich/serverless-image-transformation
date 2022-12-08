@@ -1,3 +1,4 @@
+import type { HttpError } from 'http-errors';
 import type {
   ValidatedAPIGatewayProxyEvent,
   ValidatedEventAPIGatewayProxyEvent,
@@ -17,26 +18,39 @@ const baseHandler: ValidatedEventAPIGatewayProxyEvent<
   const { body, headers } = event;
   logger.debug('Async image transformation request received', { data: body });
 
-  const input: Input = await setDefaultOptions(<Input>body, headers);
-  const { options, destination } = input;
-  const output: OrchestratorOutput = await transform(input);
+  try {
+    const input: Input = await setDefaultOptions(<Input>body, headers);
+    const { options, destination } = input;
+    const output: OrchestratorOutput = await transform(input);
 
-  if (destination.http) {
+    if (destination.http) {
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': mimeTypes.lookup(options.outputFormat),
+        },
+        body: output.destImage.toString('base64'),
+        isBase64Encoded: true,
+      };
+    }
+
+    // Return the S3 url
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': mimeTypes.lookup(options.outputFormat),
-      },
-      body: output.destImage.toString('base64'),
-      isBase64Encoded: true,
+      body: JSON.stringify({ url: output.s3Url }),
+    };
+  } catch (error) {
+    const { name, message, statusCode = 500 } = <Error | HttpError>error;
+
+    logger.error(`Error during async image operation ${name} ${message}`, {
+      data: { body },
+    });
+
+    return {
+      statusCode,
+      body: JSON.stringify({ name, message, statusCode }),
     };
   }
-
-  // Return the S3 url
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ url: output.s3Url }),
-  };
 };
 
 export const handler = middyfyWithRequestBody(

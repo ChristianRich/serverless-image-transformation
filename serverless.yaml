@@ -66,6 +66,10 @@ custom:
     target: node16
     platform: node
     concurrency: 10
+  apiKeys:
+    - name: apikey
+      value: ${ssm:/aws/reference/secretsmanager/dev/sls-image-transform/api-key} # This path MUST be valid or deployment will fail
+      deleteAtRemoval: false # Retain secret when stack is removed
 functions:
   getPreSignedUrl:
     handler: src/handlers/pre-signed-url.handler
@@ -76,7 +80,7 @@ functions:
           path: /presign/{type}/{filename}
           method: get
           cors: true
-          private: false # TODO add api-key protection
+          private: true
   transformAsync:
     handler: src/handlers/transform-async.handler
     description: |
@@ -89,7 +93,7 @@ functions:
           path: /async
           method: post
           cors: true
-          private: false
+          private: true
   transformSync:
     handler: src/handlers/transform-sync.handler
     description: |
@@ -101,7 +105,7 @@ functions:
           path: /sync
           method: post
           cors: true
-          private: false
+          private: true
   getImageMetaData:
     handler: src/handlers/meta-data.handler
     description: |
@@ -111,7 +115,7 @@ functions:
           path: /meta-data
           method: get
           cors: true
-          private: false
+          private: true
 resources:
   Resources:
     ImageBucket:

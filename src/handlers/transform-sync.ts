@@ -1,3 +1,4 @@
+import type { HttpError } from 'http-errors';
 import type {
   ValidatedAPIGatewayProxyEvent,
   ValidatedEventAPIGatewayProxyEvent,
@@ -17,19 +18,32 @@ const baseHandler: ValidatedEventAPIGatewayProxyEvent<
   const { body, headers } = event;
   logger.debug('Sync image transformation request received', { data: body });
 
-  const input: Input = await setDefaultOptions(<Input>body, headers);
+  try {
+    const input: Input = await setDefaultOptions(<Input>body, headers);
 
-  // Synchronous invocation aka "fire & forget"
-  // eslint-disable-next-line no-void
-  void transform(input);
+    // Synchronous invocation aka "fire & forget"
+    // eslint-disable-next-line no-void
+    void transform(input);
 
-  // Return the computed S3 url immediately
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      url: resolveS3AbsoluteUrl(input.destination.s3.key),
-    }),
-  };
+    // Return the computed S3 url immediately
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        url: resolveS3AbsoluteUrl(input.destination.s3.key),
+      }),
+    };
+  } catch (error) {
+    const { name, message, statusCode = 500 } = <Error | HttpError>error;
+
+    logger.error(`Error during async image operation ${name} ${message}`, {
+      data: { body },
+    });
+
+    return {
+      statusCode,
+      body: JSON.stringify({ name, message, statusCode }),
+    };
+  }
 };
 
 export const handler = middyfyWithRequestBody(

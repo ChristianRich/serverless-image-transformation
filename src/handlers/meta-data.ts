@@ -1,5 +1,7 @@
+import type { HttpError } from 'http-errors';
 import { middyfy } from '@/middleware';
 import { fetchImage } from '@/services/axios/image';
+import logger from '@/services/logger';
 import { getMetadata } from '@/services/sharp/meta-data';
 import {
   APIGatewayProxyEvent,
@@ -23,9 +25,15 @@ const baseHandler: APIGatewayProxyHandler = async (
       body: JSON.stringify(metaData),
     };
   } catch (error) {
+    const { name, message, statusCode = 500 } = <Error | HttpError>error;
+
+    logger.error(`User getting image meta-data ${name} ${message}`, {
+      data: { url },
+    });
+
     return {
-      statusCode: 500,
-      body: JSON.stringify(error),
+      statusCode,
+      body: JSON.stringify({ name, message, statusCode }),
     };
   }
 };
